@@ -11,7 +11,7 @@
 Для сборки проекта необходимо выполнить следующую команду
 ```
 cd /tmp
-git clone ...
+git clone https://github.com/khromenokroman/copy/tree/master
 cd copy
 mkdir build && cd build
 cmake ..
