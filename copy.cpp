@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     int progres = 0, curr_read, curr_write;
-    const size_t SIZE_BUFFER = 1;
+    const size_t SIZE_BUFFER = 100;
     char *buf = nullptr;
 
     buf = (char *)malloc(SIZE_BUFFER); // просим ОС дать памяти под буфер
@@ -45,12 +45,35 @@ int main(int argc, char *argv[])
 
         if (file_read != SIZE_BUFFER) // проверим а полностью ли буфер занят
         {
-            file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
+            char *buf_new = (char *)malloc(file_read); // попросим еще памяти у ОС
+            for (int i = 0; i < file_read; i++)        // добавим в новый буфер валидные данные
+            {
+                buf_new[i] = buf[i];
+            }
+            file_write = write(fd_write, buf_new, file_read); // запишем
+            free(buf_new);                                    // освободим ресурс
+
+            if (file_write == -1) // проверим вдруг не получилось
+            {
+                std::cout << "cannot write file " << argv[2] << "\n";
+                free(buf);
+                free(buf_new);
+                close(fd_read);
+                close(fd_write);
+                return -1;
+            }
         }
         else
         {
             file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
-            std::cout << "buf: " << buf << std::endl;
+            if (file_write == -1)                           // проверим вдруг не получилось
+            {
+                std::cout << "cannot write file " << argv[2] << "\n";
+                free(buf);
+                close(fd_read);
+                close(fd_write);
+                return -1;
+            }
         }
 
         if (file_write != file_read) // если что то пошло не так
