@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
     }
 
     size_t file_read, file_write;
-    while ((file_read = read(fd_read, buf, SIZE_BUFFER)) > 0) //читаем до тех пока есть считанные байты
+    while ((file_read = read(fd_read, buf, SIZE_BUFFER)) > 0) // читаем до тех пока есть считанные байты
     {
-        if(file_read == -1) // вдруг не прочитал
+        if (file_read == -1) // вдруг не прочитал
         {
             std::cout << "cannot read file " << argv[1] << "\n";
             free(buf);
@@ -45,8 +45,20 @@ int main(int argc, char *argv[])
         }
 
         file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
+        // std::cout << "read: " << file_read << "\n"
+        //           << "write: " << file_write << "\n";
         
-        if(file_write==-1) // вдруг не прочитал
+        // if (file_write != file_read)
+        // {
+        //     std::cout << "error, maybe disk full or rlimit_fsize"
+        //               << "\n";
+        //     free(buf);
+        //     close(fd_read);
+        //     close(fd_write);
+        //     return -1;
+        // }
+
+        if (file_write == -1) // вдруг не прочитал
         {
             std::cout << "cannot write file " << argv[2] << "\n";
             free(buf);
