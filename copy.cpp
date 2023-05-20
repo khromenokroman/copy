@@ -4,6 +4,7 @@
 
 int main(int argc, char *argv[])
 {
+    int progres = 0, count=0;
     const size_t SIZE_BUFFER = 5;
     char *buf = nullptr;
 
@@ -45,9 +46,15 @@ int main(int argc, char *argv[])
         }
 
         file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
+
+        system("clear"); //что то типо прогресс бара
+        count++;
+        progres = SIZE_BUFFER * count; 
+        std::cout << "copy is: " << progres++ << " Byte"<< "\n";
+
         // std::cout << "read: " << file_read << "\n"
         //           << "write: " << file_write << "\n";
-        
+
         // if (file_write != file_read)
         // {
         //     std::cout << "error, maybe disk full or rlimit_fsize"
