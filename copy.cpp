@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     int progres = 0, count=0;
-    const size_t SIZE_BUFFER = 5;
+    const size_t SIZE_BUFFER = 5000;
     char *buf = nullptr;
 
     buf = (char *)malloc(SIZE_BUFFER); // просим ОС дать памяти под буфер
@@ -44,8 +44,18 @@ int main(int argc, char *argv[])
             close(fd_write);
             return -1;
         }
+        
+        if (file_read != SIZE_BUFFER) //проверим а полностью ли буфер занят
+        {
+            size_t size_buf_new = file_read;
+            char *buf_new = (char*)malloc(size_buf_new); //создадим новый
+            file_write = write(fd_write, buf_new, size_buf_new); // пишем в файл
+        }
+        else
+        {
+            file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
 
-        file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
+        }
 
         system("clear"); //что то типо прогресс бара
         count++;
@@ -55,15 +65,15 @@ int main(int argc, char *argv[])
         // std::cout << "read: " << file_read << "\n"
         //           << "write: " << file_write << "\n";
 
-        // if (file_write != file_read)
-        // {
-        //     std::cout << "error, maybe disk full or rlimit_fsize"
-        //               << "\n";
-        //     free(buf);
-        //     close(fd_read);
-        //     close(fd_write);
-        //     return -1;
-        // }
+        if (file_write != file_read)
+        {
+            std::cout << "error, maybe disk full or rlimit_fsize"
+                      << "\n";
+            free(buf);
+            close(fd_read);
+            close(fd_write);
+            return -1;
+        }
 
         if (file_write == -1) // вдруг не прочитал
         {
