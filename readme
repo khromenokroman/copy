@@ -1,0 +1,1 @@
+g++ ./copy && a.out 1.txt 2.txt
