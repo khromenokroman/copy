@@ -1,1 +1,0 @@
-g++ ./copy.cpp && a.out 1.txt 2.txt
