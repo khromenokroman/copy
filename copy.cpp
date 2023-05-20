@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[])
 {
-    int progres = 0, count=0;
-    const size_t SIZE_BUFFER = 1024;
+    int progres = 0, curr_read, curr_write;
+    const size_t SIZE_BUFFER = 1;
     char *buf = nullptr;
 
     buf = (char *)malloc(SIZE_BUFFER); // просим ОС дать памяти под буфер
@@ -18,16 +18,14 @@ int main(int argc, char *argv[])
     }
     int fd_read, fd_write;
     fd_read = open(argv[1], O_RDONLY); // открываем файл источник
-
-    if (fd_read == -1) // вдруг не открылся
+    if (fd_read == -1)                 // вдруг не открылся
     {
         std::cout << "cannot open file " << argv[1] << "\n";
         return -1;
     }
 
-    fd_write = open(argv[2], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); // открывваем фалй приемник
-
-    if (fd_read == -1) // вдруг не открылся
+    fd_write = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); // открывваем фалй приемник
+    if (fd_read == -1)                                                                                                 // вдруг не открылся
     {
         std::cout << "cannot open file " << argv[2] << "\n";
         return -1;
@@ -44,29 +42,26 @@ int main(int argc, char *argv[])
             close(fd_write);
             return -1;
         }
-        
-        if (file_read != SIZE_BUFFER) //проверим а полностью ли буфер занят
+
+        if (file_read != SIZE_BUFFER) // проверим а полностью ли буфер занят
         {
-            size_t size_buf_new = file_read;
-            char *buf_new = (char*)malloc(size_buf_new); //создадим новый
-            file_write = write(fd_write, buf_new, size_buf_new); // пишем в файл
-            free(buf_new);
+            file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
         }
         else
         {
             file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
-
+            std::cout << "buf: " << buf << std::endl;
         }
 
-        if (file_write != file_read) //если что то пошло не так
+        if (file_write != file_read) // если что то пошло не так
         {
-            std::cout << "warn!"<< std::endl;
+            std::cout << "warn!" << std::endl;
             return -1;
         }
-        system("clear"); //что то типо прогресс бара
-        count++;
-        progres = SIZE_BUFFER * count; 
-        std::cout << "copy is: " << progres++ << " Byte"<< "\n";
+        system("clear"); // что то типо прогресс бара
+        progres += file_write;
+        std::cout << "copy is: " << progres << " Byte"
+                  << "\n";
 
         if (file_write == -1) // вдруг не прочитал
         {
