@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     int progres = 0, curr_read, curr_write;
-    const size_t SIZE_BUFFER = 100;
+    const size_t SIZE_BUFFER = 50000;
     char *buf = nullptr;
 
     buf = (char *)malloc(SIZE_BUFFER); // просим ОС дать памяти под буфер
