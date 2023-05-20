@@ -21,5 +21,5 @@ cmake --build .
 ### Запуск
 
 ```
-copy 1.ex 23.exe
+copy 1.exe 23.exe
 ```
