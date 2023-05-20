@@ -2,75 +2,63 @@
 #include <unistd.h>
 #include <iostream>
 
-
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
-    {
-        std::cout << "need more arguments!"
-                  << "\n";
-        return -1;
-    }
-
-    int fd_read, fd_write, curr;
+    const size_t SIZE_BUFFER = 5;
     char *buf = nullptr;
-    char *buf_enter = nullptr;
-    ssize_t file_read, file_write;
-    int len = 10000;
-    buf = (char *)malloc(len); // просим у ОС выделить память
 
-    if (buf == NULL) // проверка
+    buf = (char *)malloc(SIZE_BUFFER); // просим ОС дать памяти под буфер
+
+    if (NULL == buf) // провека, вдруг не даст
     {
-        std::cout << "not memory"
+        std::cout << "not memory!"
                   << "\n";
         return -1;
     }
+    int fd_read, fd_write;
+    fd_read = open(argv[1], O_RDONLY); // открываем файл источник
 
-    std::cout << "open file " << argv[1] << "\n";
-    fd_read = open(argv[1], O_RDONLY); // открываем файл на чтение
-    fd_write = open(argv[2], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); // открываем файл на запись
-
-    if (fd_read == -1) //проверка
+    if (fd_read == -1) // вдруг не открылся
     {
-        std::cout << "cannor open file: " << argv[1] << "\n";
+        std::cout << "cannot open file " << argv[1] << "\n";
         return -1;
     }
 
-    if (fd_write == -1) //проверка
+    fd_write = open(argv[2], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); // открывваем фалй приемник
+
+    if (fd_read == -1) // вдруг не открылся
+    {
+        std::cout << "cannot open file " << argv[2] << "\n";
+        return -1;
+    }
+
+    size_t file_read, file_write;
+    while ((file_read = read(fd_read, buf, SIZE_BUFFER)) > 0) //читаем до тех пока есть считанные байты
+    {
+        if(file_read == -1) // вдруг не прочитал
         {
-            std::cout << "cannot open file " << argv[2] << "\n";
+            std::cout << "cannot read file " << argv[1] << "\n";
+            free(buf);
+            close(fd_read);
+            close(fd_write);
             return -1;
         }
 
-
-
-
- 
-    file_read = read(fd_read, buf, len); // читаем файлик в буфер
-    if (file_read == -1)
-    {
-        std::cout << "cannot read file " << argv[1] << "\n";
-        return -1;
-    }
-    else if (file_read == 0)
-    {
-        std::cout << "file " << argv[1] << " is empty!"
-                  << "\n";
-    }
-    else
-    {
+        file_write = write(fd_write, buf, SIZE_BUFFER); // пишем в файл
         
-  
-        file_write = write(fd_write, buf, len); // пишем в файл из буфера
-        if (file_write == -1)
+        if(file_write==-1) // вдруг не прочитал
         {
-            std::cout << "cannot write in file " << argv[2] << "\n";
+            std::cout << "cannot write file " << argv[2] << "\n";
+            free(buf);
+            close(fd_read);
+            close(fd_write);
             return -1;
         }
-        std::cout << "I'm write " << file_write << " byte!"
-                  << "\n";
     }
-    // чистим ресурсы
+
+    std::cout << "copy is OK!" << std::endl;
+
+    // отдаем занятые ресурсы
     free(buf);
     close(fd_read);
     close(fd_write);
